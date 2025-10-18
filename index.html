@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptography Experiment</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #F4F4F7;
+            min-height: 100vh;
+        }
+
+        /* Layout Structure */
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: #FFFFFF;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .nav-links {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .nav-links li {
+            margin-bottom: 5px;
+        }
+
+        .nav-links a {
+            display: block;
+            padding: 15px 20px;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-links a:hover {
+            background-color: #f5f5f5;
+            border-left-color: #FFA500;
+        }
+
+        .nav-links a.active {
+            background-color: #FFA500;
+            color: white;
+            border-left-color: #FF8C00;
+        }
+
+        /* Content Area Styles */
+        .content {
+            flex: 1;
+            padding: 30px;
+            margin-left: 250px;
+        }
+
+        .breadcrumb {
+            margin-bottom: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .card {
+            background-color: #FFFFFF;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        p {
+            line-height: 1.6;
+            color: #444;
+            margin-bottom: 15px;
+        }
+
+        ul,
+        ol {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layout">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <ul class="nav-links">
+                <li><a href="index.html" class="active">Aim</a></li>
+                <li><a href="theory.html">Theory</a></li>
+                <li><a href="objective.html">Objective</a></li>
+                <li><a href="procedure.html">Procedure</a></li>
+                <li><a href="simulation.html">Simulation</a></li>
+                <li><a href="assignment.html">Assignment</a></li>
+                <li><a href="references.html">References</a></li>
+                <li><a href="feedback.html">Feedback</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="content">
+            <div class="breadcrumb">
+                <p>Computer Science and Engineering > OAuth2 Authentication > Experiments</p>
+            </div>
+
+            <div class="card">
+                <h1>Aim: Implement OAuth2 Authentication (Basic Flow Simulation)</h1>
+                <p>This experiment aims to understand and simulate the OAuth2 authorization flow, providing a hands-on
+                    experience with one of the most widely used authorization protocols on the internet.</p>
+            </div>
+
+            <div class="card">
+                <h2>Goal 1: Understand Core Concepts</h2>
+                <p>The primary goal of this experiment is to understand OAuth2 as an authorization protocol designed for
+                    secure, delegated access to resources without sharing user credentials. Through this simulation, you
+                    will learn how OAuth2 enables third-party applications to obtain limited access to a user's account
+                    on another service, without exposing the user's password or full account access.</p>
+            </div>
+
+            <div class="card">
+                <h2>Goal 2: Learn the Roles and Flow</h2>
+                <p>This experiment will help you identify and understand the different roles in the OAuth2 ecosystem:
+                </p>
+                <ul>
+                    <li><strong>Client:</strong> The application requesting access to resources</li>
+                    <li><strong>Resource Owner:</strong> The user who authorizes the application</li>
+                    <li><strong>Authorization Server:</strong> The server issuing access tokens after authenticating the
+                        resource owner</li>
+                    <li><strong>Resource Server:</strong> The server hosting the protected resources</li>
+                </ul>
+                <p>You will also learn the standardized flow for obtaining and using an access token to securely access
+                    protected resources.</p>
+            </div>
+
+            <div class="card">
+                <h2>Goal 3: Appreciate the Benefits</h2>
+                <p>Through this experiment, you will recognize the key advantages of OAuth2:</p>
+                <ul>
+                    <li><strong>Enhanced Security:</strong> Credentials are never shared with third-party applications
+                    </li>
+                    <li><strong>User Convenience:</strong> Simplified authorization process with granular permission
+                        control</li>
+                    <li><strong>Scalability:</strong> Support for various client types and application scenarios</li>
+                    <li><strong>Standardization:</strong> Widely adopted protocol that ensures interoperability across
+                        services</li>
+                </ul>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

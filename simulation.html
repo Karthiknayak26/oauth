@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OAuth2 Authentication - Flow Simulation</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(45deg, #2c3e50, #3498db);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      min-height: 800px;
+    }
+
+    .left-section {
+      padding: 40px;
+      background: #f8f9fa;
+      border-right: 2px solid #e9ecef;
+      overflow-y: auto;
+    }
+
+    .right-section {
+      padding: 40px;
+      background: #fff;
+      overflow-y: auto;
+    }
+
+    .section-title {
+      color: #2c3e50;
+      font-size: 1.6em;
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 30px;
+      background: #3498db;
+      border-radius: 2px;
+    }
+
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .oauth-btn {
+      padding: 15px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-google {
+      background: #EA4335;
+      color: white;
+    }
+
+    .btn-google:hover {
+      background: #d33c2d;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(234, 67, 53, 0.3);
+    }
+
+    .btn-github {
+      background: #24292e;
+      color: white;
+    }
+
+    .btn-github:hover {
+      background: #1a1e22;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(36, 41, 46, 0.3);
+    }
+
+    .btn-manual {
+      background: #3498db;
+      color: white;
+    }
+
+    .btn-manual:hover {
+      background: #2980b9;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-logout {
+      background: #e74c3c;
+      color: white;
+      margin-top: 15px;
+    }
+
+    .btn-logout:hover {
+      background: #c0392b;
+    }
+
+    .btn:disabled {
+      background: #bdc3c7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .flow-diagram {
+      background: #e8f4fd;
+      border: 2px solid #3498db;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+
+    .flow-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 12px 0;
+      font-size: 14px;
+      color: #2c3e50;
+    }
+
+    .flow-step::before {
+      content: '';
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #3498db;
+      flex-shrink: 0;
+    }
+
+    .status-panel {
+      background: #fff;
+      border: 2px solid #e9ecef;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+
+    .status-header {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 15px;
+      font-size: 1.1em;
+    }
+
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .status-item:last-child {
+      border-bottom: none;
+    }
+
+    .status-label {
+      font-weight: 500;
+      color: #34495e;
+    }
+
+    .status-value {
+      color: #7f8c8d;
+      word-break: break-all;
+      max-width: 150px;
+      text-align: right;
+    }
+
+    .status-value.active {
+      color: #27ae60;
+      font-weight: 600;
+    }
+
+    .message {
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      font-weight: 500;
+    }
+
+    .success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .token-display {
+      background: #2c3e50;
+      color: #ecf0f1;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      word-break: break-all;
+      line-height: 1.5;
+      margin: 15px 0;
+    }
+
+    .explanation-box {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .explanation-box h5 {
+      color: #856404;
+      margin-bottom: 8px;
+    }
+
+    .explanation-box p {
+      color: #856404;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .flow-visualization {
+      background: #f0f7ff;
+      border: 2px dashed #3498db;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+
+    .parties {
+      display: flex;
+      justify-content: space-around;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .party {
+      background: white;
+      border: 2px solid #3498db;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      flex: 1;
+    }
+
+    .party-name {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 8px;
+    }
+
+    .party-role {
+      font-size: 12px;
+      color: #7f8c8d;
+    }
+
+    .flow-arrow {
+      text-align: center;
+      font-size: 24px;
+      color: #3498db;
+      margin: 15px 0;
+    }
+
+    .code-block {
+      background: #2c3e50;
+      color: #ecf0f1;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      overflow-x: auto;
+      line-height: 1.4;
+      margin: 10px 0;
+    }
+
+    .user-profile {
+      background: #e8f4fd;
+      border: 2px solid #3498db;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+
+    .profile-header {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 15px;
+      font-size: 1.1em;
+    }
+
+    .profile-item {
+      display: flex;
+      gap: 15px;
+      padding: 10px 0;
+      border-bottom: 1px solid #bdc3c7;
+    }
+
+    .profile-item:last-child {
+      border-bottom: none;
+    }
+
+    .profile-icon {
+      font-size: 24px;
+      width: 40px;
+      text-align: center;
+    }
+
+    .profile-info {
+      flex: 1;
+    }
+
+    .profile-label {
+      font-weight: 500;
+      color: #34495e;
+      font-size: 12px;
+    }
+
+    .profile-value {
+      color: #2c3e50;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+
+      .left-section {
+        border-right: none;
+        border-bottom: 2px solid #e9ecef;
+      }
+
+      .parties {
+        flex-direction: column;
+      }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: #F4F4F7;
+      min-height: 100vh;
+    }
+
+    /* Layout Structure */
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      width: 250px;
+      background-color: #FFFFFF;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .nav-links {
+      list-style: none;
+      padding: 20px 0;
+    }
+
+    .nav-links li {
+      margin-bottom: 5px;
+    }
+
+    .nav-links a {
+      display: block;
+      padding: 15px 20px;
+      color: #333;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border-left: 4px solid transparent;
+    }
+
+    .nav-links a:hover {
+      background-color: #f5f5f5;
+      border-left-color: #FFA500;
+    }
+
+    .nav-links a.active {
+      background-color: #FFA500;
+      color: white;
+      border-left-color: #FF8C00;
+    }
+
+    /* Content Area Styles */
+    .content {
+      flex: 1;
+      padding: 30px;
+      margin-left: 250px;
+    }
+
+    .breadcrumb {
+      margin-bottom: 20px;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .card {
+      background-color: #FFFFFF;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 25px;
+      margin-bottom: 25px;
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: #333;
+      margin-bottom: 15px;
+    }
+
+    p {
+      line-height: 1.6;
+      color: #444;
+      margin-bottom: 15px;
+    }
+
+    ul,
+    ol {
+      padding-left: 20px;
+      margin-bottom: 15px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔐 OAuth2 Authentication Flow</h1>
+      <p>Interactive Educational Lab - Basic Authorization Flow Simulation</p>
+    </div>
+    <div class="layout">
+      <!-- Sidebar Navigation -->
+      <nav class="sidebar">
+        <ul class="nav-links">
+          <li><a href="index.html">Aim</a></li>
+          <li><a href="theory.html">Theory</a></li>
+          <li><a href="objective.html">Objective</a></li>
+          <li><a href="procedure.html">Procedure</a></li>
+          <li><a href="simulation.html">Simulation</a></li>
+          <li><a href="assignment.html">Assignment</a></li>
+          <li><a href="references.html">References</a></li>
+          <li><a href="feedback.html" class="active">Feedback</a></li>
+        </ul>
+      </nav>
+
+      <main class="content">
+        <div class="main-content">
+          <!-- Left Section: Flow & Controls -->
+          <div class="left-section">
+            <div class="section-title">🔄 OAuth2 Flow Simulation</div>
+
+            <div class="flow-visualization">
+              <div class="parties">
+                <div class="party">
+                  <div class="party-name">👤 Resource Owner</div>
+                  <div class="party-role">You (User)</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="party">
+                  <div class="party-name">📱 Client</div>
+                  <div class="party-role">This App</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="party">
+                  <div class="party-name">🔑 Auth Server</div>
+                  <div class="party-role">Google/GitHub</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-diagram">
+              <strong style="color: #2c3e50;">OAuth2 Flow Steps:</strong>
+              <div class="flow-step">User clicks "Login with Provider"</div>
+              <div class="flow-step">Redirects to authorization server</div>
+              <div class="flow-step">User grants permission</div>
+              <div class="flow-step">Auth server sends authorization code</div>
+              <div class="flow-step">Client exchanges code for access token</div>
+              <div class="flow-step">Client accesses user resources</div>
+              <div class="flow-step">User logged in successfully!</div>
+            </div>
+
+            <div class="button-group">
+              <button class="oauth-btn btn-google" id="googleBtn">
+                <span>🔴</span> Login with Google
+              </button>
+              <button class="oauth-btn btn-github" id="githubBtn">
+                <span>⚫</span> Login with GitHub
+              </button>
+              <button class="oauth-btn btn-manual" id="manualAuthBtn">
+                <span>⚙️</span> Manual Authorization Flow
+              </button>
+            </div>
+
+            <div id="statusMessage"></div>
+          </div>
+
+          <!-- Right Section: Flow Details & Status -->
+          <div class="right-section">
+            <div class="section-title">📊 Flow Details & Status</div>
+
+            <div class="status-panel">
+              <div class="status-header">Current Authentication Status</div>
+              <div class="status-item">
+                <span class="status-label">Status:</span>
+                <span class="status-value" id="statusText">Not Authenticated</span>
+              </div>
+              <div class="status-item">
+                <span class="status-label">Provider:</span>
+                <span class="status-value" id="providerText">—</span>
+              </div>
+              <div class="status-item">
+                <span class="status-label">Flow Stage:</span>
+                <span class="status-value" id="stageText">Waiting for action</span>
+              </div>
+            </div>
+
+            <div id="flowDetails" class="hidden">
+              <div class="explanation-box">
+                <h5>🔀 Understanding the OAuth2 Flow</h5>
+                <p><strong>Authorization Code:</strong> Temporary code used to exchange for access token. Never exposed
+                  to
+                  user.</p>
+                <p><strong>Access Token:</strong> Token used to access protected resources. Has expiration time.</p>
+                <p><strong>Redirect URI:</strong> Safe endpoint where authorization server returns the code.</p>
+              </div>
+
+              <div class="status-panel">
+                <div class="status-header">🔐 Step 1: Authorization Code Generation</div>
+                <div class="status-item">
+                  <span class="status-label">Authorization Code:</span>
+                </div>
+                <div class="token-display" id="authCodeDisplay">Waiting...</div>
+              </div>
+
+              <div class="status-panel">
+                <div class="status-header">🎫 Step 2: Token Exchange</div>
+                <div class="status-item">
+                  <span class="status-label">Access Token:</span>
+                </div>
+                <div class="token-display" id="accessTokenDisplay">Waiting...</div>
+                <div class="status-item">
+                  <span class="status-label">Token Type:</span>
+                  <span class="status-value" id="tokenTypeDisplay">—</span>
+                </div>
+                <div class="status-item">
+                  <span class="status-label">Expires In:</span>
+                  <span class="status-value" id="expiresInDisplay">—</span>
+                </div>
+                <div class="status-item">
+                  <span class="status-label">Scope:</span>
+                  <span class="status-value" id="scopeDisplay">—</span>
+                </div>
+              </div>
+
+              <div class="status-panel">
+                <div class="status-header">📝 Step 3: Access User Info</div>
+                <div class="user-profile" id="userProfile" style="display: none;">
+                  <div class="profile-header">Authenticated User Information</div>
+                  <div class="profile-item">
+                    <div class="profile-icon">👤</div>
+                    <div class="profile-info">
+                      <div class="profile-label">Name</div>
+                      <div class="profile-value" id="userName">—</div>
+                    </div>
+                  </div>
+                  <div class="profile-item">
+                    <div class="profile-icon">📧</div>
+                    <div class="profile-info">
+                      <div class="profile-label">Email</div>
+                      <div class="profile-value" id="userEmail">—</div>
+                    </div>
+                  </div>
+                  <div class="profile-item">
+                    <div class="profile-icon">🆔</div>
+                    <div class="profile-info">
+                      <div class="profile-label">User ID</div>
+                      <div class="profile-value" id="userId">—</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="authenticatedSection" class="hidden">
+              <div class="message success">
+                ✅ You are successfully authenticated with OAuth2!
+              </div>
+
+              <div class="user-profile">
+                <div class="profile-header">Your Profile</div>
+                <div class="profile-item">
+                  <div class="profile-icon">👤</div>
+                  <div class="profile-info">
+                    <div class="profile-label">Name</div>
+                    <div class="profile-value" id="displayName">—</div>
+                  </div>
+                </div>
+                <div class="profile-item">
+                  <div class="profile-icon">📧</div>
+                  <div class="profile-info">
+                    <div class="profile-label">Email</div>
+                    <div class="profile-value" id="displayEmail">—</div>
+                  </div>
+                </div>
+                <div class="profile-item">
+                  <div class="profile-icon">🔑</div>
+                  <div class="profile-info">
+                    <div class="profile-label">Provider</div>
+                    <div class="profile-value" id="displayProvider">—</div>
+                  </div>
+                </div>
+                <div class="profile-item">
+                  <div class="profile-icon">⏰</div>
+                  <div class="profile-info">
+                    <div class="profile-label">Token Expires</div>
+                    <div class="profile-value" id="displayExpires">—</div>
+                  </div>
+                </div>
+              </div>
+
+              <button class="oauth-btn btn-logout" id="logoutBtn">🚪 Logout</button>
+            </div>
+          </div>
+      </main>
+    </div>
+  </div>
+
+
+  <script>
+    // =============================================================================
+    // OAuth2 Authentication Flow Simulation
+    // Educational Lab - Shows how OAuth2 works step by step
+    // =============================================================================
+
+    const API_BASE = 'http://localhost:3001'; // OAuth2 server
+
+    // OAuth2 Configuration
+    const oauth2Config = {
+      google: {
+        clientId: 'demo-google-client-id',
+        provider: 'Google',
+        scope: 'openid profile email',
+        redirectUri: 'http://localhost:8080/callback'
+      },
+      github: {
+        clientId: 'demo-github-client-id',
+        provider: 'GitHub',
+        scope: 'user:email',
+        redirectUri: 'http://localhost:8080/callback'
+      }
+    };
+
+    // State management
+    let authState = {
+      authenticated: false,
+      provider: null,
+      accessToken: null,
+      refreshToken: null,
+      user: null,
+      expiresAt: null
+    };
+
+    // DOM Elements
+    const googleBtn = document.getElementById('googleBtn');
+    const githubBtn = document.getElementById('githubBtn');
+    const manualAuthBtn = document.getElementById('manualAuthBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const statusMessage = document.getElementById('statusMessage');
+    const flowDetails = document.getElementById('flowDetails');
+    const authenticatedSection = document.getElementById('authenticatedSection');
+
+    // Event Listeners
+    googleBtn.addEventListener('click', () => startOAuth2Flow('google'));
+    githubBtn.addEventListener('click', () => startOAuth2Flow('github'));
+    manualAuthBtn.addEventListener('click', showManualFlow);
+    logoutBtn.addEventListener('click', logout);
+
+    // =============================================================================
+    // STEP 1: Initiate OAuth2 Flow
+    // =============================================================================
+    async function startOAuth2Flow(provider) {
+      try {
+        const config = oauth2Config[provider];
+        console.log(`Starting ${config.provider} OAuth2 flow...`);
+
+        updateStatus(`Initiating ${config.provider} authentication...`, 'info');
+
+        // Generate state parameter for CSRF protection
+        const state = generateRandomString(32);
+        sessionStorage.setItem('oauth_state', state);
+        sessionStorage.setItem('oauth_provider', provider);
+
+        // Step 1: Request authorization code from auth server
+        const authorizationCode = await requestAuthorizationCode(provider, state);
+
+        if (authorizationCode) {
+          updateStatus(`Received authorization code from ${config.provider}`, 'success');
+
+          // Step 2: Exchange code for access token
+          await exchangeCodeForToken(authorizationCode, provider);
+        }
+
+      } catch (error) {
+        console.error('OAuth2 flow error:', error);
+        updateStatus(`❌ Error: ${error.message}`, 'error');
+        flowDetails.classList.add('hidden');
+      }
+    }
+
+    // =============================================================================
+    // STEP 1A: Request Authorization Code
+    // =============================================================================
+    async function requestAuthorizationCode(provider, state) {
+      try {
+        updateFlowStage('Requesting authorization code...');
+
+        const config = oauth2Config[provider];
+
+        // In a real app, this would redirect to provider's authorization endpoint
+        // For demo, we'll call our backend to simulate it
+        const response = await fetch(`${API_BASE}/oauth2/authorize`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            provider,
+            clientId: config.clientId,
+            redirectUri: config.redirectUri,
+            scope: config.scope,
+            state
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          console.log('Authorization code received:', data.authorizationCode);
+
+          // Display the authorization code (for educational purposes)
+          document.getElementById('authCodeDisplay').textContent =
+            `AUTH_CODE: ${data.authorizationCode}`;
+
+          flowDetails.classList.remove('hidden');
+          updateFlowStage('Authorization code received. Exchanging for token...');
+
+          return data.authorizationCode;
+        } else {
+          throw new Error(data.message || 'Failed to get authorization code');
+        }
+
+      } catch (error) {
+        console.error('Authorization code request failed:', error);
+        throw error;
+      }
+    }
+
+    // =============================================================================
+    // STEP 2: Exchange Code for Access Token
+    // =============================================================================
+    async function exchangeCodeForToken(authorizationCode, provider) {
+      try {
+        updateFlowStage('Exchanging authorization code for access token...');
+
+        const config = oauth2Config[provider];
+
+        const response = await fetch(`${API_BASE}/oauth2/token`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            grantType: 'authorization_code',
+            code: authorizationCode,
+            clientId: config.clientId,
+            redirectUri: config.redirectUri,
+            provider
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          console.log('Access token received');
+
+          // Store tokens
+          authState.accessToken = data.accessToken;
+          authState.refreshToken = data.refreshToken;
+          authState.provider = provider;
+          authState.expiresAt = new Date(Date.now() + data.expiresIn * 1000);
+
+          // Display token info
+          document.getElementById('accessTokenDisplay').textContent =
+            `TOKEN: ${data.accessToken.substring(0, 50)}...`;
+          document.getElementById('tokenTypeDisplay').textContent = data.tokenType || 'Bearer';
+          document.getElementById('expiresInDisplay').textContent =
+            `${data.expiresIn} seconds`;
+          document.getElementById('scopeDisplay').textContent = data.scope || config.scope;
+
+          updateFlowStage('Access token received. Fetching user info...');
+
+          // Step 3: Get user information
+          await fetchUserInfo(data.accessToken, provider);
+
+        } else {
+          throw new Error(data.message || 'Failed to exchange code for token');
+        }
+
+      } catch (error) {
+        console.error('Token exchange failed:', error);
+        updateStatus(`❌ Token exchange failed: ${error.message}`, 'error');
+        throw error;
+      }
+    }
+
+    // =============================================================================
+    // STEP 3: Fetch User Information
+    // =============================================================================
+    async function fetchUserInfo(accessToken, provider) {
+      try {
+        updateFlowStage('Fetching user information...');
+
+        const response = await fetch(`${API_BASE}/oauth2/userinfo`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+          },
+          body: JSON.stringify({ provider })
+        });
+
+        const userData = await response.json();
+
+        if (response.ok) {
+          console.log('User info received:', userData);
+
+          // Store user data
+          authState.user = userData;
+          authState.authenticated = true;
+
+          // Display user info
+          document.getElementById('userName').textContent = userData.name;
+          document.getElementById('userEmail').textContent = userData.email;
+          document.getElementById('userId').textContent = userData.id;
+
+          updateFlowStage('Complete! User authenticated.');
+          updateStatus(
+            `✅ Successfully logged in as ${userData.name}!`,
+            'success'
+          );
+
+          // Show authenticated section
+          setTimeout(() => showAuthenticatedState(), 1500);
+
+        } else {
+          throw new Error(userData.message || 'Failed to fetch user info');
+        }
+
+      } catch (error) {
+        console.error('User info fetch failed:', error);
+        updateStatus(`❌ Failed to fetch user info: ${error.message}`, 'error');
+      }
+    }
+
+    // =============================================================================
+    // Manual Authorization Flow Visualization
+    // =============================================================================
+    function showManualFlow() {
+      updateStatus('📋 Manual OAuth2 Flow initialized...', 'info');
+      flowDetails.classList.remove('hidden');
+
+      // Simulate the flow steps
+      const steps = [
+        { delay: 500, message: 'Step 1: Generating authorization code...' },
+        {
+          delay: 1500, action: () => {
+            const code = generateRandomString(20);
+            document.getElementById('authCodeDisplay').textContent = `AUTH_CODE: ${code}`;
+          }
+        },
+        { delay: 2500, message: 'Step 2: Simulating user authorization...' },
+        { delay: 3500, message: 'Step 3: Exchanging code for access token...' },
+        {
+          delay: 4500, action: () => {
+            const token = generateRandomString(40);
+            document.getElementById('accessTokenDisplay').textContent =
+              `TOKEN: ${token}...`;
+            document.getElementById('tokenTypeDisplay').textContent = 'Bearer';
+            document.getElementById('expiresInDisplay').textContent = '3600 seconds';
+            document.getElementById('scopeDisplay').textContent = 'user:profile user:email';
+          }
+        },
+        { delay: 5500, message: 'Step 4: Requesting user information...' },
+        {
+          delay: 6500, action: () => {
+            document.getElementById('userName').textContent = 'Demo User';
+            document.getElementById('userEmail').textContent = 'demo@example.com';
+            document.getElementById('userId').textContent = 'user_12345';
+            authState.user = {
+              name: 'Demo User',
+              email: 'demo@example.com',
+              id: 'user_12345'
+            };
+            authState.authenticated = true;
+            authState.provider = 'manual';
+          }
+        },
+        { delay: 7500, message: '✅ OAuth2 flow completed successfully!', type: 'success' }
+      ];
+
+      steps.forEach(step => {
+        setTimeout(() => {
+          if (step.action) {
+            step.action();
+          } else {
+            updateFlowStage(step.message);
+            if (step.type === 'success') {
+              updateStatus(step.message, 'success');
+              setTimeout(showAuthenticatedState, 1000);
+            }
+          }
+        }, step.delay);
+      });
+    }
+
+    // =============================================================================
+    // Show Authenticated State
+    // =============================================================================
+    function showAuthenticatedState() {
+      flowDetails.classList.add('hidden');
+      authenticatedSection.classList.remove('hidden');
+
+      document.getElementById('displayName').textContent = authState.user.name;
+      document.getElementById('displayEmail').textContent = authState.user.email;
+      document.getElementById('displayProvider').textContent =
+        authState.provider.charAt(0).toUpperCase() + authState.provider.slice(1);
+      document.getElementById('displayExpires').textContent =
+        authState.expiresAt ? authState.expiresAt.toLocaleString() : 'Unknown';
+
+      document.getElementById('statusText').textContent = 'Authenticated';
+      document.getElementById('statusText').classList.add('active');
+      document.getElementById('providerText').textContent = authState.provider;
+      document.getElementById('stageText').textContent = 'Logged in successfully';
+
+      // Disable login buttons
+      googleBtn.disabled = true;
+      githubBtn.disabled = true;
+      manualAuthBtn.disabled = true;
+    }
+
+    // =============================================================================
+    // Logout
+    // =============================================================================
+    function logout() {
+      console.log('Logging out...');
+
+      // Clear state
+      authState = {
+        authenticated: false,
+        provider: null,
+        accessToken: null,
+        refreshToken: null,
+        user: null,
+        expiresAt: null
+      };
+
+      // Reset UI
+      authenticatedSection.classList.add('hidden');
+      flowDetails.classList.add('hidden');
+      statusMessage.innerHTML = '';
+
+      document.getElementById('statusText').textContent = 'Not Authenticated';
+      document.getElementById('statusText').classList.remove('active');
+      document.getElementById('providerText').textContent = '—';
+      document.getElementById('stageText').textContent = 'Waiting for action';
+
+      // Enable login buttons
+      googleBtn.disabled = false;
+      githubBtn.disabled = false;
+      manualAuthBtn.disabled = false;
+
+      updateStatus('✅ Logged out successfully', 'success');
+
+      // Reset form displays
+      document.getElementById('authCodeDisplay').textContent = 'Waiting...';
+      document.getElementById('accessTokenDisplay').textContent = 'Waiting...';
+      document.getElementById('tokenTypeDisplay').textContent = '—';
+      document.getElementById('expiresInDisplay').textContent = '—';
+      document.getElementById('scopeDisplay').textContent = '—';
+      document.getElementById('userName').textContent = '—';
+      document.getElementById('userEmail').textContent = '—';
+      document.getElementById('userId').textContent = '—';
+    }
+
+    // =============================================================================
+    // Utility Functions
+    // =============================================================================
+
+    function updateStatus(message, type = 'info') {
+      const messageEl = document.getElementById('statusMessage');
+      messageEl.innerHTML = `<div class="message ${type}">${message}</div>`;
+      console.log(`[${type}] ${message}`);
+    }
+
+    function updateFlowStage(stage) {
+      document.getElementById('stageText').textContent = stage;
+    }
+
+    function generateRandomString(length) {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let result = '';
+      for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
+    }
+
+    // Check if already authenticated on page load
+    window.addEventListener('load', () => {
+      console.log('OAuth2 Frontend loaded and ready');
+      updateStatus('Ready to authenticate. Click a login button to start.', 'info');
+    });
+  </script>
+</body>
+
+</html>

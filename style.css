@@ -1,0 +1,185 @@
+/* Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* OAuth Button Styles */
+.oauth-btn {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.oauth-btn.btn-logout {
+  background-color: #dc3545;
+  color: white;
+}
+
+.oauth-btn.btn-logout:hover {
+  background-color: #c82333;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #F4F4F7;
+  min-height: 100vh;
+}
+
+/* Layout Structure */
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: 250px;
+  background-color: #FFFFFF;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.nav-links {
+  list-style: none;
+  padding: 20px 0;
+}
+
+.nav-links li {
+  margin-bottom: 5px;
+}
+
+.nav-links a {
+  display: block;
+  padding: 15px 20px;
+  color: #333;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border-left: 4px solid transparent;
+}
+
+.nav-links a:hover {
+  background-color: #f5f5f5;
+  border-left-color: #FFA500;
+}
+
+.nav-links a.active {
+  background-color: #FFA500;
+  color: white;
+  border-left-color: #FF8C00;
+}
+
+/* Content Area Styles */
+.content {
+  flex: 1;
+  padding: 30px;
+  margin-left: 250px;
+}
+
+
+
+
+.breadcrumb {
+  margin-bottom: 20px;
+  color: #666;
+  font-size: 14px;
+}
+
+.card {
+  background-color: #FFFFFF;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 25px;
+  margin-bottom: 25px;
+}
+
+h1,
+h2,
+h3 {
+  color: #333;
+  margin-bottom: 15px;
+}
+
+p {
+  line-height: 1.6;
+  color: #444;
+  margin-bottom: 15px;
+}
+
+ul,
+ol {
+  padding-left: 20px;
+  margin-bottom: 15px;
+}
+
+li {
+  margin-bottom: 8px;
+}
+
+/* Simulation Page Specific Styles */
+.simulator-container {
+  padding: 20px 0;
+}
+
+.input-group,
+.output-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+button {
+  padding: 12px 20px;
+  background-color: #FFA500;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #FF8C00;
+}
+
+.visualization {
+  min-height: 200px;
+  border: 1px dashed #ccc;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 15px;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
