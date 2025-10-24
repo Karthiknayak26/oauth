@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OAuth2 Authentication - Feedback</title>
+  <title>OAuth2 Authentication - Aim</title>
   <style>
     * {
       margin: 0;
@@ -18,6 +18,7 @@
       background-size: 400% 400%;
       animation: gradient-shift 15s ease infinite;
       display: flex;
+      position: relative;
       overflow-x: hidden;
       min-height: 100vh;
     }
@@ -108,14 +109,14 @@
 
     .sidebar {
       width: 240px;
-      background: linear-gradient(180deg, rgba(26, 26, 46, 0.95), rgba(30, 30, 50, 0.95));
+      background: linear-gradient(180deg, rgba(26, 26, 46, 0.95) 0%, rgba(30, 30, 50, 0.95) 100%);
       backdrop-filter: blur(10px);
       position: fixed;
       height: 100vh;
       padding: 30px 20px;
       box-shadow: 4px 0 30px rgba(0, 255, 136, 0.2);
       transform: translateX(-100%);
-      transition: transform 0.4s ease;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       z-index: 1000;
       border-right: 2px solid rgba(0, 255, 136, 0.3);
       overflow-y: auto;
@@ -123,16 +124,20 @@
       top: 0;
     }
 
+    .sidebar.open {
+      transform: translateX(0);
+    }
+
     .sidebar::before {
       content: '🔐 SECURE NAVIGATION';
       display: block;
-      color: #ffdd00;
+      color: #e29d06;
       font-size: 0.75em;
       font-weight: bold;
       letter-spacing: 2px;
       margin-bottom: 25px;
       padding-bottom: 15px;
-      border-bottom: 2px solid rgba(255, 204, 0, 0.3);
+      border-bottom: 2px solid rgba(240, 209, 4, 0.3);
       text-align: center;
       animation: text-glow 2s ease-in-out infinite;
     }
@@ -141,21 +146,16 @@
 
       0%,
       100% {
-        text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+        text-shadow: 0 0 10px rgba(244, 188, 5, 0.5);
       }
 
       50% {
-        text-shadow: 0 0 20px rgba(255, 204, 0, 0.8);
+        text-shadow: 0 0 20px rgba(255, 196, 0, 0.8);
       }
-    }
-
-    .sidebar.open {
-      transform: translateX(0);
     }
 
     .sidebar ul {
       list-style: none;
-      padding: 0;
     }
 
     .sidebar ul li {
@@ -164,7 +164,7 @@
 
     .sidebar ul li a {
       text-decoration: none;
-      color: #d4b100;
+      color: #00d4aa;
       display: block;
       padding: 14px 18px;
       border-radius: 10px;
@@ -176,17 +176,14 @@
     .sidebar ul li a:hover {
       background: rgba(0, 255, 136, 0.15);
       border-color: rgba(0, 255, 136, 0.4);
-      transform: translateX(8px);
-      box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
-      color: #ffe100;
+      color: #ffdd00;
     }
 
     .sidebar ul li a.active {
-      background: linear-gradient(135deg, #ffee00 0%, #d4b100 100%);
+      background: linear-gradient(135deg, #ffff00 0%, #d4bf00 100%);
       color: #0a0e27;
       font-weight: bold;
-      border-color: #ffea00;
-      box-shadow: 0 0 25px rgba(255, 213, 0, 0.6);
+      border-color: #ffd900;
     }
 
     .content-area {
@@ -194,7 +191,7 @@
       padding: 30px;
       flex-grow: 1;
       background-color: transparent;
-      transition: margin-left 0.4s ease;
+      transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       min-height: 100vh;
     }
 
@@ -206,9 +203,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #ffa200 0%, #00d4aa 100%);
+      background: linear-gradient(135deg, #ffee00 0%, #d49400 100%);
       color: #0a0e27;
-      padding: 12px;
+      padding: 12px 16px;
       border: none;
       border-radius: 10px;
       cursor: pointer;
@@ -219,18 +216,9 @@
       left: 15px;
       z-index: 1001;
       transition: all 0.3s ease;
-      box-shadow: 0 4px 20px rgba(0, 255, 136, 0.5);
-      border: 2px solid rgba(0, 255, 136, 0.3);
+      box-shadow: 0 4px 20px rgba(255, 204, 0, 0.5);
       width: 50px;
       height: 50px;
-    }
-
-    .menu-toggle:hover {
-      transform: scale(1.05);
-    }
-
-    .menu-toggle:active {
-      transform: scale(0.95);
     }
 
     @media (min-width: 1024px) {
@@ -249,19 +237,19 @@
 
     .breadcrumb {
       font-size: 0.9em;
-      color: #00d4aa;
+      color: #d4bb00;
       margin-bottom: 25px;
       text-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
     }
 
     .page-title {
-      color: #ffcc00;
+      color: #ffe600;
       margin-bottom: 35px;
       font-size: 2.5em;
       font-weight: bold;
       text-transform: uppercase;
       letter-spacing: 2px;
-      text-shadow: 0 0 20px rgba(238, 255, 0, 0.6);
+      text-shadow: 0 0 20px rgba(255, 238, 0, 0.6);
       position: relative;
       padding-bottom: 20px;
     }
@@ -273,7 +261,7 @@
       left: 0;
       width: 100px;
       height: 4px;
-      background: linear-gradient(90deg, #ffb300, transparent);
+      background: linear-gradient(90deg, #ffee00, transparent);
     }
 
     .card {
@@ -283,23 +271,25 @@
       border-radius: 15px;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       margin-bottom: 25px;
-      border: 2px solid rgba(0, 255, 136, 0.3);
+      border: 2px solid rgba(255, 242, 0, 0.3);
       transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
     }
 
     .card:hover {
       transform: translateY(-8px);
       box-shadow: 0 12px 48px rgba(0, 255, 136, 0.4);
-      border-color: rgba(255, 183, 0, 0.6);
+      border-color: rgba(255, 204, 0, 0.6);
     }
 
     .card h2 {
-      color: #ffd500;
+      color: #ffd900;
       margin-bottom: 20px;
       font-size: 1.8em;
       text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
-      border-bottom: 2px solid rgba(0, 255, 136, 0.3);
       padding-bottom: 15px;
+      border-bottom: 2px solid rgba(0, 255, 136, 0.3);
     }
 
     .card p,
@@ -310,54 +300,13 @@
       margin-bottom: 12px;
     }
 
-    form label {
-      display: block;
-      margin-bottom: 8px;
+    .card ul {
+      margin-left: 20px;
+      padding-left: 20px;
+    }
+
+    .card ul li::marker {
       color: #00ff88;
-      font-weight: bold;
-    }
-
-    form input[type="text"],
-    form input[type="email"],
-    form textarea {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid rgba(0, 255, 136, 0.3);
-      border-radius: 10px;
-      background-color: rgba(0, 0, 0, 0.2);
-      color: #00d4aa;
-      font-family: 'Courier New', monospace;
-      transition: all 0.3s ease;
-    }
-
-    form input:focus,
-    form textarea:focus {
-      outline: none;
-      border-color: #00ff88;
-      box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
-    }
-
-    form div {
-      margin-bottom: 20px;
-    }
-
-    form button[type="submit"] {
-      background: linear-gradient(135deg, #ffea00 0%, #00d4aa 100%);
-      color: #0a0e27;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 1.1em;
-      font-weight: bold;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      transition: all 0.3s ease;
-    }
-
-    form button[type="submit"]:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 25px rgba(0, 255, 136, 0.6);
     }
 
     ::-webkit-scrollbar {
@@ -368,6 +317,20 @@
       background: linear-gradient(180deg, #00ff88 0%, #00d4aa 100%);
       border-radius: 10px;
     }
+
+    @media (max-width: 768px) {
+      .page-title {
+        font-size: 1.8em;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      .card h2 {
+        font-size: 1.4em;
+      }
+    }
   </style>
 </head>
 
@@ -377,49 +340,56 @@
     <aside class="sidebar">
       <nav>
         <ul>
-          <li><a href="aim.html">Aim</a></li>
+          <li><a href="aim.html" class="active">Aim</a></li>
           <li><a href="theory.html">Theory</a></li>
           <li><a href="objective.html">Objective</a></li>
           <li><a href="procedure.html">Procedure</a></li>
           <li><a href="simulation.html">Simulation</a></li>
           <li><a href="index.html">Assignment</a></li>
           <li><a href="references.html">References</a></li>
-          <li><a href="feedback.html" class="active">Feedback</a></li>
+          <li><a href="feedback.html">Feedback</a></li>
         </ul>
       </nav>
     </aside>
     <main class="content-area">
       <div class="breadcrumb">Computer Science and Engineering > OAuth2 Authentication > Experiments</div>
-      <h1 class="page-title">Feedback</h1>
+      <h1 class="page-title">Aim</h1>
       <div class="card">
-        <h2>Your Thoughts Matter!</h2>
-        <p>We appreciate your feedback on this experiment. Please use the form below to share your thoughts,
-          suggestions, or report any issues.</p>
-        <form action="#" method="POST">
-          <div>
-            <label for="name">Name (Optional):</label>
-            <input type="text" id="name" name="name">
-          </div>
-          <div>
-            <label for="email">Email (Optional):</label>
-            <input type="email" id="email" name="email">
-          </div>
-          <div>
-            <label for="feedback">Your Feedback:</label>
-            <textarea id="feedback" name="feedback" rows="6"></textarea>
-          </div>
-          <button type="submit">Submit Feedback</button>
-        </form>
+        <h2>Understanding OAuth 2.0 Concepts</h2>
+        <ul>
+          <li>Comprehend the problem OAuth 2.0 solves: delegated authorization without sharing credentials.</li>
+          <li>Learn the distinct roles involved: Client, Resource Owner, Authorization Server, Resource Server.</li>
+          <li>Understand the purpose and flow of the Authorization Code grant type.</li>
+          <li>Recognize the function of key elements like Client ID, Client Secret, Authorization Code, Access Token,
+            and Redirect URI.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h2>Practical Implementation</h2>
+        <ul>
+          <li>Simulate the interactions between different OAuth 2.0 roles in a simplified environment.</li>
+          <li>Build a basic Authorization Server capable of issuing authorization codes and access tokens.</li>
+          <li>Create a Client application that can initiate the flow, handle redirects, and exchange codes for tokens.
+          </li>
+          <li>Set up a Resource Server that protects an API endpoint and validates access tokens.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h2>Security Awareness</h2>
+        <ul>
+          <li>Appreciate the security benefits of OAuth 2.0 compared to direct credential sharing.</li>
+          <li>Understand the importance of secure handling of client secrets and access tokens.</li>
+        </ul>
       </div>
     </main>
   </div>
   <script>
-    const toggle = document.querySelector('.menu-toggle');
+    const menuToggle = document.querySelector('.menu-toggle');
     const sidebar = document.querySelector('.sidebar');
-    const content = document.querySelector('.content-area');
-    toggle.addEventListener('click', () => {
+    const contentArea = document.querySelector('.content-area');
+    menuToggle.addEventListener('click', () => {
       sidebar.classList.toggle('open');
-      content.classList.toggle('shifted');
+      contentArea.classList.toggle('shifted');
     });
   </script>
 </body>

@@ -5,37 +5,350 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OAuth2 Authentication - Procedure</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Courier New', 'Consolas', monospace;
+      background: linear-gradient(135deg, #0a0e27, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #1a1a2e 100%);
+      background-size: 400% 400%;
+      animation: gradient-shift 15s ease infinite;
+      display: flex;
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    @keyframes gradient-shift {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image:
+        repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0, 255, 136, 0.03) 2px, rgba(0, 255, 136, 0.03) 4px),
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 136, 0.03) 2px, rgba(0, 255, 136, 0.03) 4px);
+      pointer-events: none;
+      z-index: 0;
+      animation: grid-move 20s linear infinite;
+    }
+
+    @keyframes grid-move {
+      0% {
+        transform: translate(0, 0);
+      }
+
+      100% {
+        transform: translate(20px, 20px);
+      }
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image:
+        radial-gradient(2px 2px at 20% 30%, rgba(0, 255, 136, 0.3), transparent),
+        radial-gradient(2px 2px at 60% 70%, rgba(0, 212, 255, 0.3), transparent),
+        radial-gradient(2px 2px at 50% 50%, rgba(162, 155, 254, 0.3), transparent),
+        radial-gradient(2px 2px at 80% 10%, rgba(0, 255, 136, 0.3), transparent);
+      background-size: 200px 200px, 300px 300px, 250px 250px, 350px 350px;
+      animation: particles-float 20s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes particles-float {
+
+      0%,
+      100% {
+        transform: translate(0, 0);
+      }
+
+      25% {
+        transform: translate(10px, -10px);
+      }
+
+      50% {
+        transform: translate(-5px, 5px);
+      }
+
+      75% {
+        transform: translate(5px, 10px);
+      }
+    }
+
+    .container {
+      display: flex;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .sidebar {
+      width: 240px;
+      background: linear-gradient(180deg, rgba(26, 26, 46, 0.95), rgba(30, 30, 50, 0.95));
+      backdrop-filter: blur(10px);
+      position: fixed;
+      height: 100vh;
+      padding: 30px 20px;
+      box-shadow: 4px 0 30px rgba(0, 255, 136, 0.2);
+      transform: translateX(-100%);
+      transition: transform 0.4s ease;
+      z-index: 1000;
+      border-right: 2px solid rgba(0, 255, 136, 0.3);
+      overflow-y: auto;
+      left: 0;
+      top: 0;
+    }
+
+    .sidebar.open {
+      transform: translateX(0);
+    }
+
+    .sidebar::before {
+      content: '🔐 SECURE NAVIGATION';
+      display: block;
+      color: #ffaa00;
+      font-size: 0.75em;
+      font-weight: bold;
+      letter-spacing: 2px;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid rgba(0, 255, 136, 0.3);
+      text-align: center;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .sidebar ul li {
+      margin-bottom: 12px;
+    }
+
+    .sidebar ul li a {
+      text-decoration: none;
+      color: #d48600;
+      display: block;
+      padding: 14px 18px;
+      border-radius: 10px;
+      border: 2px solid transparent;
+      background: rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .sidebar ul li a:hover {
+      background: rgba(0, 255, 136, 0.15);
+      border-color: rgba(0, 255, 136, 0.4);
+      transform: translateX(8px);
+      color: #ffb700;
+    }
+
+    .sidebar ul li a.active {
+      background: linear-gradient(135deg, #00ff88, #00d4aa);
+      color: #0a0e27;
+      font-weight: bold;
+      border-color: #00ff88;
+      box-shadow: 0 0 25px rgba(0, 255, 136, 0.6);
+    }
+
+    .menu-toggle {
+      background: linear-gradient(135deg, #ffaa00, #00d4aa);
+      color: #0a0e27;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 24px;
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 1001;
+      box-shadow: 0 4px 20px rgba(0, 255, 136, 0.5);
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .content-area {
+      margin-left: 0;
+      padding: 30px;
+      flex-grow: 1;
+      transition: margin-left 0.4s ease;
+      min-height: 100vh;
+      background-color: transparent;
+    }
+
+    .content-area.shifted {
+      margin-left: 240px;
+    }
+
+    @media (min-width: 1024px) {
+      .sidebar {
+        transform: translateX(0) !important;
+      }
+
+      .content-area {
+        margin-left: 240px !important;
+      }
+
+      .menu-toggle {
+        display: none !important;
+      }
+    }
+
+    .breadcrumb {
+      font-size: 0.9em;
+      color: #00d4aa;
+      margin-bottom: 25px;
+    }
+
+    .page-title {
+      color: #ffbb00;
+      margin-bottom: 35px;
+      font-size: 2.5em;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+      padding-bottom: 20px;
+      border-bottom: 3px solid rgba(0, 255, 136, 0.3);
+    }
+
+    .card {
+      background: rgba(26, 26, 46, 0.9);
+      padding: 30px;
+      border-radius: 15px;
+      border: 2px solid rgba(0, 255, 136, 0.3);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      margin-bottom: 25px;
+    }
+
+    .card h2 {
+      color: #ffb300;
+      margin-bottom: 20px;
+      border-bottom: 2px solid rgba(0, 255, 136, 0.3);
+      padding-bottom: 10px;
+    }
+
+    .card p,
+    .card li {
+      color: #00d4aa;
+      line-height: 1.8;
+      font-size: 1.05em;
+      margin-bottom: 12px;
+    }
+
+    .card ul,
+    .card ol {
+      margin-left: 20px;
+    }
+  </style>
 </head>
 
 <body>
-  <div class="layout">
-    <!-- Sidebar Navigation -->
-    <nav class="sidebar">
-      <ul class="nav-links">
-        <li><a href="index.html">Aim</a></li>
-        <li><a href="theory.html">Theory</a></li>
-        <li><a href="objective.html">Objective</a></li>
-        <li><a href="procedure.html" class="active">Procedure</a></li>
-        <li><a href="simulation.html">Simulation</a></li>
-        <li><a href="assignment.html">Assignment</a></li>
-        <li><a href="references.html">References</a></li>
-        <li><a href="feedback.html">Feedback</a></li>
-      </ul>
-    </nav>
+  <button class="menu-toggle" id="menu-toggle">☰</button>
+  <div class="container">
+    <aside class="sidebar" id="sidebar">
+      <nav>
+        <ul>
+          <li><a href="aim.html">Aim</a></li>
+          <li><a href="theory.html">Theory</a></li>
+          <li><a href="objective.html">Objective</a></li>
+          <li><a href="procedure.html" class="active">Procedure</a></li>
+          <li><a href="simulation.html">Simulation</a></li>
+          <li><a href="index.html">Assignment</a></li>
+          <li><a href="references.html">References</a></li>
+          <li><a href="feedback.html">Feedback</a></li>
+        </ul>
+      </nav>
+    </aside>
 
-    <!-- Main Content Area -->
-    <main class="content">
-      <div class="breadcrumb">
-        <p>Computer Science and Engineering > OAuth2 Authentication > Experiments</p>
-      </div>
-
+    <main class="content-area" id="content-area">
+      <div class="breadcrumb">Computer Science and Engineering > OAuth2 Authentication > Experiments</div>
+      <h1 class="page-title">Procedure</h1>
       <div class="card">
-        <h1>Procedure</h1>
-        <p>This page will detail the steps to perform the OAuth2 Authentication experiment.</p>
+        <h2>Step-by-Step Guide</h2>
+        <p>This section outlines the detailed steps to conduct the experiment simulating the OAuth2 Authorization Code
+          Flow.</p>
+        <ol>
+          <li><strong>Set up the Environment:</strong>
+            <ul>
+              <li>Create three projects: Client Application, Authorization Server, and Resource Server.</li>
+              <li>Authorization and Resource Servers can be combined with distinct endpoints.</li>
+            </ul>
+          </li>
+          <li><strong>Register the Client Application:</strong>
+            <ul>
+              <li>Configure client credentials on the Authorization Server.</li>
+              <li>Provide Client ID, Client Secret, and Redirect URI (e.g., http://localhost:3000/callback).</li>
+            </ul>
+          </li>
+          <li><strong>Implement the Authorization Endpoint:</strong>
+            <ul>
+              <li>Create `/authorize` endpoint accepting client_id, response_type=code, and redirect_uri.</li>
+              <li>Display login and consent screens, then redirect with an Authorization Code.</li>
+            </ul>
+          </li>
+          <li><strong>Implement the Token Endpoint:</strong>
+            <ul>
+              <li>Create secure `/token` endpoint to exchange code for Access Token.</li>
+              <li>Validate client_id, client_secret, and authorization_code.</li>
+            </ul>
+          </li>
+          <li><strong>Implement the Resource Server Endpoint:</strong>
+            <ul>
+              <li>Create `/api/userinfo` endpoint validating Authorization: Bearer &lt;access_token&gt; header.</li>
+              <li>Return mock protected user data.</li>
+            </ul>
+          </li>
+          <li><strong>Implement the Client-Side Flow:</strong>
+            <ul>
+              <li>Create a login button linking to `/authorize` with proper parameters.</li>
+              <li>Handle `/callback` to exchange code for Access Token.</li>
+              <li>Use Access Token to fetch data from `/api/userinfo`.</li>
+            </ul>
+          </li>
+        </ol>
       </div>
     </main>
   </div>
+
+  <script>
+    const toggleBtn = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const contentArea = document.getElementById('content-area');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+      contentArea.classList.toggle('shifted');
+    });
+  </script>
 </body>
 
 </html>

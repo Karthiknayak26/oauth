@@ -145,7 +145,7 @@ app.post('/oauth2/authorize', (req, res) => {
 
         // Validate client
         if (!authorizedClients[clientId]) {
-            console.log('❌ Invalid client ID');
+            console.log(`❌ Invalid client ID: ${clientId}`);
             return res.status(400).json({
                 success: false,
                 message: 'Invalid client ID'
@@ -156,7 +156,7 @@ app.post('/oauth2/authorize', (req, res) => {
 
         // Validate redirect URI
         if (!client.redirectUris.includes(redirectUri)) {
-            console.log('❌ Invalid redirect URI');
+            console.log(`❌ Invalid redirect URI. Received: ${redirectUri}, Expected: ${client.redirectUris.join(', ')}`);
             return res.status(400).json({
                 success: false,
                 message: 'Invalid redirect URI'
